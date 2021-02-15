@@ -1204,7 +1204,6 @@ const puppeteer = require('puppeteer');
     static getZoomScores(res, country) {
         (async () => {
             const browser = await puppeteer.launch({
-                headless: false,
                 ignoreDefaultArgs: ['--disable-extensions'],
                 args: [
                     '--no-sandbox',
