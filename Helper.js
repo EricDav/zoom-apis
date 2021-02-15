@@ -1252,8 +1252,6 @@ const puppeteer = require('puppeteer');
                 return res.send({success: false, message: 'There is an error while generating scores'});
             }
 
-            console.log(t);
-
             await page.waitFor(3000);
 
             await page.evaluate(() => {
