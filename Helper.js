@@ -1109,95 +1109,92 @@ const puppeteer = require('puppeteer');
                     })
                     return {fixtures: fixtures, time: time, timeObj: dateTimeObj};
                 });
+
+                await page.click('.CQ > li:nth-child(2)');
+                await page.waitFor(3000);
+            
+                try {
+                    const g = await page.evaluate(() => {
+                        const odds = []
+                
+                        oddsElem = document.querySelectorAll('.odd');
+                        oddsElem.forEach(function(item, index) {
+                            if (index%2 == 1) {
+                                odds.push({GG: oddsElem[index-1].textContent.substring(2), NG: item.textContent.substring(2)});
+                            }
+                        });
+                
+                        document.querySelectorAll('.itm2 > span')[0].click();
+                        document.querySelectorAll('.CQ')[1].children[0].click();
+                
+                        return odds;
+                
+                    });
+
+                    try {
+                        await page.waitFor(4000);
+                        const overUnder1 = await page.evaluate(() => {
+                            const odds = []
+                            oddsElem = document.querySelectorAll('.odd');
+                            let over1Str;
+                            let under1Str;
+                    
+                            oddsElem.forEach(function(item, index) {
+                                if (index%2 == 1) {
+                                    over1Str = oddsElem[index-1].textContent;
+                                    under1Str = item.textContent;
+                                    odds.push({over1: over1Str.substring(4, over1Str.length - 3), 
+                                        under1: under1Str.substring(5, under1Str.length - 3)});
+                                }
+                            });
+                    
+                            document.querySelectorAll('.CQ')[1].children[1].click();
+                            return odds;
+                        });
+                        try {
+                            await page.waitFor(3000);
+                            const overUnder3 = await page.evaluate(() => {
+                                const odds = []
+                                oddsElem = document.querySelectorAll('.odd');
+                                let over3Str;
+                                let under3Str;
+                        
+                                oddsElem.forEach(function(item, index) {
+                                    if (index%2 == 1) {
+                                        over3Str = oddsElem[index-1].textContent;
+                                        under3Str = item.textContent;
+                                        odds.push({over3: over3Str.substring(4, over3Str.length - 3), 
+                                            under3: under3Str.substring(5, under3Str.length - 3)});
+                                    }
+                                });
+                                return odds;
+                            });
+
+                            t.fixtures.forEach(function(item, index) {
+                                item.odds.GG = g[index].GG;
+                                item.odds.NG = g[index].NG;
+                                item.odds.over1 = overUnder1[index].over1;
+                                item.odds.under1 = overUnder1[index].under1;
+                                item.odds.over3 = overUnder3[index].over3;
+                                item.odds.under3 = overUnder3[index].under3;
+                            });
+                
+                            await browser.close();
+                        
+                            return res.send({success: true, data: t.fixtures, time: t.time, dateTimeObj: t.timeObj});
+                        } catch(e) {
+                            return res.send({success: false, message: 'There is an error while generating fixtures for over3 and under3'});
+                        }
+                    } catch(e) {
+                        console.log(e);
+                        return res.send({success: false, message: 'There is an error while generating fixtures for over1 and under1'});
+                    }
+                } catch(e) {
+                    return res.send({success: false, message: 'There is an error while generating fixtures for GG and NG'});
+                }
             } catch(e) {
                 return res.send({success: false, message: 'There is an error while generating main fixtures'});
             }
-
-            await page.click('.CQ > li:nth-child(2)');
-            await page.waitFor(3000);
-        
-            try {
-                const g = await page.evaluate(() => {
-                    const odds = []
-            
-                    oddsElem = document.querySelectorAll('.odd');
-                    oddsElem.forEach(function(item, index) {
-                        if (index%2 == 1) {
-                            odds.push({GG: oddsElem[index-1].textContent.substring(2), NG: item.textContent.substring(2)});
-                        }
-                    });
-            
-                    document.querySelectorAll('.itm2 > span')[0].click();
-                    document.querySelectorAll('.CQ')[1].children[0].click();
-            
-                    return odds;
-            
-                });
-            } catch(e) {
-                return res.send({success: false, message: 'There is an error while generating fixtures for GG and NG'});
-            }
-        
-        
-            await page.waitFor(4000);
-        
-            try {
-                const overUnder1 = await page.evaluate(() => {
-                    const odds = []
-                    oddsElem = document.querySelectorAll('.odd');
-                    let over1Str;
-                    let under1Str;
-            
-                    oddsElem.forEach(function(item, index) {
-                        if (index%2 == 1) {
-                            over1Str = oddsElem[index-1].textContent;
-                            under1Str = item.textContent;
-                            odds.push({over1: over1Str.substring(4, over1Str.length - 3), 
-                                under1: under1Str.substring(5, under1Str.length - 3)});
-                        }
-                    });
-            
-                    document.querySelectorAll('.CQ')[1].children[1].click();
-                    return odds;
-                });
-            } catch(e) {
-                return res.send({success: false, message: 'There is an error while generating fixtures for over1 and under1'});
-            }
-        
-            await page.waitFor(3000);
-        
-            try {
-                const overUnder3 = await page.evaluate(() => {
-                    const odds = []
-                    oddsElem = document.querySelectorAll('.odd');
-                    let over3Str;
-                    let under3Str;
-            
-                    oddsElem.forEach(function(item, index) {
-                        if (index%2 == 1) {
-                            over3Str = oddsElem[index-1].textContent;
-                            under3Str = item.textContent;
-                            odds.push({over3: over3Str.substring(4, over3Str.length - 3), 
-                                under3: under3Str.substring(5, under3Str.length - 3)});
-                        }
-                    });
-                    return odds;
-                });
-            } catch(e) {
-                return res.send({success: false, message: 'There is an error while generating fixtures for over3 and under3'});
-            }
-        
-            t.fixtures.forEach(function(item, index) {
-                item.odds.GG = g[index].GG;
-                item.odds.NG = g[index].NG;
-                item.odds.over1 = overUnder1[index].over1;
-                item.odds.under1 = overUnder1[index].under1;
-                item.odds.over3 = overUnder3[index].over3;
-                item.odds.under3 = overUnder3[index].under3;
-            });
-
-            await browser.close();
-        
-            return res.send({success: true, data: t.fixtures, time: t.time, dateTimeObj: t.timeObj});
         })();
     }
 
@@ -1248,40 +1245,41 @@ const puppeteer = require('puppeteer');
                 
                     return teams
                 });
+
+                await page.waitFor(3000);
+
+                await page.evaluate(() => {
+                    document.querySelector('.top-nav__list-item').click();
+                });
+    
+                await page.waitFor(5000);
+    
+                try {
+                    const tableInfo = await page.evaluate(() => {
+                        const forms = document.querySelectorAll('.form');
+                        const positions = document.querySelectorAll('.l-table__team-name');
+                        f = [];
+                        p = [];
+        
+                        forms.forEach((item, index) => {
+                            f.push(item.textContent);
+                            p.push(positions[index].textContent);
+                        });
+        
+                        return {forms: f, positions: p};
+        
+                    });
+
+                    await browser.close();
+
+                    return res.send({success: true, data: t, forms: tableInfo.forms, positions: tableInfo.positions});
+                } catch(e) {
+                    return res.send({success: false, message: 'There is an error while generating forms'});
+                }
             } catch(e) {
+                console.log(e);
                 return res.send({success: false, message: 'There is an error while generating scores'});
             }
-
-            await page.waitFor(3000);
-
-            await page.evaluate(() => {
-                document.querySelector('.top-nav__list-item').click();
-            });
-
-            await page.waitFor(5000);
-
-            try {
-                const tableInfo = await page.evaluate(() => {
-                    const forms = document.querySelectorAll('.form');
-                    const positions = document.querySelectorAll('.l-table__team-name');
-                    f = [];
-                    p = [];
-    
-                    forms.forEach((item, index) => {
-                        f.push(item.textContent);
-                        p.push(positions[index].textContent);
-                    });
-    
-                    return {forms: f, positions: p};
-    
-                });
-            } catch(e) {
-                return res.send({success: false, message: 'There is an error while generating forms'});
-            }
-
-            await browser.close();
-
-            return res.send({success: true, data: t, forms: tableInfo.forms, positions: tableInfo.positions});
         })();
     }
 
